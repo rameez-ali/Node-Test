@@ -14,37 +14,66 @@ const getAllContact = asyncHandler(async(req, res) => {
 //@route post /api/contacts
 //@access public
 
-const createContact = (req, res) => {
+const createContact = asyncHandler(async(req, res) => {
     const {name, email, phone} = req.body;
     if(!name || !email || !phone){
         res.status(400);
         throw new Error("All fields are mandatory");
     }
-    res.status(201).json({message:"Created Contacts"});
-}
+    const contact = await Contact.create({
+        name,
+        email,
+        phone,
+    });
+
+    res.status(201).json(contact);
+});
 
 //@desc get single contact
 //@route get /api/contacts/:id
 //@access public
 
-const getContact = (req, res) => {
-    res.status(200).json({message:`Contact for id: ${req.params.id}`});
-}
+const getContact = asyncHandler(async(req, res) => {
+    const contact = await Contact.findById(req.params.id);
+    if(!contact){
+        res.status(404);
+        throw new Error("No Contacts Found");
+    }
+    res.status(200).json(contact);
+});
 
 //@desc update contact
 //@route put /api/contacts/:id
 //@access public
 
-const updateContact = (req, res) => {
-    res.status(200).json({message:`Update Contact for ${req.params.id}`});
-}
+const updateContact = asyncHandler(async(req, res) => {
+    const contact = await Contact.findById(req.params.id);
+    if(!contact){
+        res.status(404);
+        throw new Error("No Contacts Found");
+    }
+
+    const updatedcontact = await Contact.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        {new:true}
+    );
+    res.status(200).json(updatedcontact);
+});
 
 //@desc delete contacts
 //@route delete /api/contacts/:id
 //@access public
 
-const deleteContact = (req, res) => {
-    res.status(200).json({message:`Delete Contact for ${req.params.id}`});
-}
+const deleteContact = asyncHandler(async(req, res) => {
+    const contact = await Contact.findById(req.params.id);
+    if(!contact){
+        res.status(404);
+        throw new Error("No Contacts Found");
+    }
+
+    await contact.deleteOne()
+    res.status(200).json(contact);
+});
 
 module.exports = {getAllContact, createContact, getContact, updateContact, deleteContact}
