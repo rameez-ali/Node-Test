@@ -1,21 +1,20 @@
 const express = require("express");
+const validateToken = require("../middlewares/validateTokenHandler");
+
+const {getAllContact, getContact, createContact, updateContact, deleteContact} = require("../controllers/contactController")
 
 const router = express.Router();
 
-router.route("/").get((req, res) => {
-    res.status(200).json({message:"Get All Contacts"});
-});
+router.use(validateToken);
 
-router.route("/").post((req, res) => {
-    res.status(200).json({message:"Created Contacts"});
-});
+router.route("/").get(getAllContact);
 
-router.route("/:id").put((req, res) => {
-    res.status(200).json({message:`Update Contact for ${req.params.id}`});
-});
+router.route("/").post(createContact);
 
-router.route("/:id").delete((req, res) => {
-    res.status(200).json({message:`Delete Contact for ${req.params.id}`});
-});
+router.route("/:id").get(getContact);
+
+router.route("/:id").put(updateContact);
+
+router.route("/:id").delete(deleteContact);
 
 module.exports = router;
